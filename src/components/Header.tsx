@@ -26,6 +26,7 @@ export default function Header() {
     <>
       <Link to="/" className="hover:text-secondary transition-colors" onClick={() => setOpen(false)}>{t("home")}</Link>
       <Link to="/search" className="hover:text-secondary transition-colors" onClick={() => setOpen(false)}>{t("search")}</Link>
+      <Link to="/sangam" className="hover:text-secondary transition-colors" onClick={() => setOpen(false)}>{t("sangam")}</Link>
       <Link to="/contact" className="hover:text-secondary transition-colors" onClick={() => setOpen(false)}>{t("contact")}</Link>
       {user && <Link to="/dashboard" className="hover:text-secondary transition-colors" onClick={() => setOpen(false)}>{t("dashboard")}</Link>}
       {isAdmin(user) && <Link to="/admin" className="hover:text-secondary transition-colors" onClick={() => setOpen(false)}>{t("admin")}</Link>}

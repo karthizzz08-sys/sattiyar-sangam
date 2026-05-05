@@ -6,7 +6,7 @@ const dict = {
   en: {
     brand: "Sattiyar Matrimony",
     tagline: "Trusted matchmaking for the Sattiyar community",
-    home: "Home", search: "Search", contact: "Contact", login: "Login", register: "Register",
+    home: "Home", search: "Search", sangam: "Sangam", contact: "Contact", login: "Login", register: "Register",
     dashboard: "Dashboard", logout: "Logout", admin: "Admin",
     heroTitle: "Find Your Perfect Life Partner",
     heroSub: "Thousands of verified Sattiyar profiles from across Tamil Nadu — start your sacred journey today.",
@@ -21,7 +21,7 @@ const dict = {
   ta: {
     brand: "சத்தியர் திருமண தளம்",
     tagline: "சத்தியர் சமூகத்திற்கான நம்பகமான திருமண சேவை",
-    home: "முகப்பு", search: "தேடு", contact: "தொடர்பு", login: "உள்நுழை", register: "பதிவு",
+    home: "முகப்பு", search: "தேடு", sangam: "சங்கம்", contact: "தொடர்பு", login: "உள்நுழை", register: "பதிவு",
     dashboard: "சுயவிவரம்", logout: "வெளியேறு", admin: "நிர்வாகி",
     heroTitle: "உங்கள் வாழ்க்கைத் துணையை கண்டறியுங்கள்",
     heroSub: "தமிழ்நாடு முழுவதிலும் உள்ள ஆயிரக்கணக்கான சத்தியர் சுயவிவரங்கள்.",
