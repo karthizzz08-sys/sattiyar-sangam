@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getCurrentUser, getProfiles, Profile, seedIfEmpty } from "@/lib/store";
 import { Button } from "@/components/ui/button";

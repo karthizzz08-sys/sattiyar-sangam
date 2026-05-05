@@ -19,7 +19,8 @@ function Home() {
 
   const onSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate({ to: "/search", search: { age: Number(age), gender, location } as any });
+    void age; void gender; void location;
+    navigate({ to: "/search" });
   };
 
   return (
