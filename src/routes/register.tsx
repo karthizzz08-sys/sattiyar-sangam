@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import OTPVerify from "@/components/OTPVerify";
+import FirebaseOTPVerify from "@/components/FirebaseOTPVerify";
 
 export const Route = createFileRoute("/register")({
   component: Register,
@@ -17,8 +17,8 @@ export const Route = createFileRoute("/register")({
 function Register() {
   const navigate = useNavigate();
   const { t } = useLang();
-  const [step, setStep] = useState<"phone" | "otp" | "form">("phone");
-  const [tempPhone, setTempPhone] = useState("");
+  const [step, setStep] = useState<"otp" | "form">("otp");
+  const [verifiedPhone, setVerifiedPhone] = useState("");
   const [form, setForm] = useState({
     name: "", gender: "Male" as "Male"|"Female", dob: "", phone: "", email: "",
     community: "Sattiyar", subCaste: "", education: "", occupation: "", salary: "",
@@ -34,26 +34,20 @@ function Register() {
     r.readAsDataURL(f);
   };
 
-  const handlePhoneSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!tempPhone || tempPhone.length < 10) {
-      toast.error("Please enter a valid phone number");
+  const handlePhoneVerified = (phoneNumber: string) => {
+    // Remove +91 from phone and store
+    const phone = phoneNumber.replace(/[^0-9]/g, "");
+    
+    // Check if phone already registered
+    if (getProfiles().find(p => p.phone === phone)) {
+      toast.error("This phone number is already registered. Please use a different number or login.");
       return;
     }
-    
-    // Check if phone number is already registered
-    const existingProfile = getProfiles().find(p => p.phone === tempPhone);
-    if (existingProfile) {
-      toast.error("This phone number is already registered. Please use a different number or login instead.");
-      return;
-    }
-    
-    setForm(s => ({ ...s, phone: tempPhone }));
-    setStep("otp");
-  };
 
-  const handleOtpVerified = () => {
+    setVerifiedPhone(phone);
+    setForm(s => ({ ...s, phone }));
     setStep("form");
+    toast.success("Phone verified! Now complete your profile.");
   };
 
   const submit = (e: React.FormEvent) => {
@@ -77,7 +71,7 @@ function Register() {
       return;
     }
     if (!form.phone) {
-      toast.error("Phone number is missing. Please go back and verify your phone.");
+      toast.error("Phone number is missing. Please verify your phone again.");
       return;
     }
     
@@ -87,7 +81,7 @@ function Register() {
       return;
     }
     
-    // Check for duplicate phone (shouldn't happen but double-check)
+    // Check for duplicate phone
     if (getProfiles().some(p => p.phone === form.phone)) {
       toast.error("This phone number is already registered. Please go back and start over.");
       return;
@@ -119,47 +113,20 @@ function Register() {
         <div className="text-center mb-8">
           <h1 className="font-display text-4xl font-bold text-primary"><span className="ornament">Create Your Profile</span></h1>
           <p className="text-muted-foreground mt-2">
-            {step === "phone" && "Step 1: Verify Your Phone"}
-            {step === "otp" && "Step 2: Enter OTP"}
-            {step === "form" && "Step 3: Complete Your Profile"}
+            {step === "otp" && "Step 1: Verify Your Phone (Firebase OTP)"}
+            {step === "form" && "Step 2: Complete Your Profile"}
           </p>
         </div>
         <div className="bg-card rounded-2xl shadow-elegant border border-border p-6 md:p-8">
-          {/* Step 1: Phone Verification */}
-          {step === "phone" && (
-            <form onSubmit={handlePhoneSubmit} className="space-y-6">
-              <div>
-                <Label className="text-base font-semibold mb-2 block">Phone Number *</Label>
-                <Input
-                  type="tel"
-                  value={tempPhone}
-                  onChange={(e) => setTempPhone(e.target.value.replace(/[^0-9]/g, ""))}
-                  placeholder="9876543210"
-                  className="text-lg"
-                  maxLength={10}
-                  required
-                />
-                <p className="text-sm text-muted-foreground mt-2">We'll send an OTP to verify your phone number</p>
-              </div>
-              <Button type="submit" size="lg" className="w-full bg-primary hover:bg-primary/90">
-                Send OTP
-              </Button>
-              <p className="text-sm text-center text-muted-foreground">
-                Already a member? <Link to="/login" className="text-primary font-semibold hover:underline">Login</Link>
-              </p>
-            </form>
-          )}
-
-          {/* Step 2: OTP Verification */}
+          {/* Step 1: Firebase OTP Verification */}
           {step === "otp" && (
-            <OTPVerify
-              phone={form.phone}
-              onVerified={handleOtpVerified}
-              onBack={() => setStep("phone")}
+            <FirebaseOTPVerify
+              onSuccess={handlePhoneVerified}
+              onCancel={() => null}
             />
           )}
 
-          {/* Step 3: Complete Profile Form */}
+          {/* Step 2: Complete Profile Form */}
           {step === "form" && (
             <form onSubmit={submit} className="space-y-5">
               <div className="grid md:grid-cols-2 gap-5">
@@ -172,7 +139,7 @@ function Register() {
                 </Field>
                 <Field label="Date of Birth *"><Input type="date" value={form.dob} onChange={e=>set("dob",e.target.value)} required/></Field>
                 <Field label="Age (auto)"><Input value={age || ""} disabled/></Field>
-                <Field label="Phone"><Input type="tel" value={form.phone} disabled className="bg-muted"/></Field>
+                <Field label="Phone (Verified)"><Input type="tel" value={form.phone} disabled className="bg-muted" readOnly/></Field>
                 <Field label="Email *"><Input type="email" value={form.email} onChange={e=>set("email",e.target.value)} placeholder="your@email.com" required/></Field>
                 <Field label="Community"><Input value={form.community} disabled/></Field>
                 <Field label="Sub-caste"><Input value={form.subCaste} onChange={e=>set("subCaste",e.target.value)} placeholder="e.g. Sattiyar"/></Field>
@@ -198,7 +165,7 @@ function Register() {
                 </div>
               </Field>
               <div className="flex items-center justify-between gap-4 pt-4">
-                <Button type="button" variant="outline" onClick={() => setStep("phone")} className="flex-1">Back</Button>
+                <Button type="button" variant="outline" onClick={() => setStep("otp")} className="flex-1">Back</Button>
                 <Button 
                   type="submit" 
                   size="lg" 
