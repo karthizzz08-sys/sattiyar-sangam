@@ -10,7 +10,6 @@ import {
   signInWithPhoneNumber,
   RecaptchaVerifier,
   ConfirmationResult,
-  FirebaseAuthError,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
@@ -19,10 +18,10 @@ export const Route = createFileRoute("/login")({
   head: () => ({ meta: [{ title: "Login — Sattiyar Matrimony" }] }),
 });
 
-interface RecaptchaVerifierType {
-  clear: () => void;
-  render: () => Promise<string>;
-  verify: () => Promise<string>;
+declare global {
+  interface Window {
+    grecaptcha?: { reset: (id?: number) => void };
+  }
 }
 
 function Login() {
@@ -38,7 +37,7 @@ function Login() {
   const [recaptchaReady, setRecaptchaReady] = useState(false);
   const [isConfigured, setIsConfigured] = useState(true);
 
-  const recaptchaVerifierRef = useRef<RecaptchaVerifierType | null>(null);
+  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
   const confirmationResultRef = useRef<ConfirmationResult | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isInitializingRef = useRef(false);
@@ -276,7 +275,7 @@ function Login() {
       // Reset reCAPTCHA for potential resend
       resetRecaptcha();
     } catch (err) {
-      const firebaseErr = err as FirebaseAuthError | Error;
+      const firebaseErr = err as any | Error;
       console.error("[OTP Send] Error Details:", {
         code: "code" in firebaseErr ? firebaseErr.code : "unknown",
         message: firebaseErr.message,
@@ -424,7 +423,7 @@ function Login() {
         });
       }
     } catch (err) {
-      const firebaseErr = err as FirebaseAuthError;
+      const firebaseErr = err as any;
       console.error("[OTP Verify] Error:", {
         code: firebaseErr.code,
         message: firebaseErr.message,
