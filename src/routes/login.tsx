@@ -275,7 +275,7 @@ function Login() {
       // Reset reCAPTCHA for potential resend
       resetRecaptcha();
     } catch (err) {
-      const firebaseErr = err as FirebaseAuthError | Error;
+      const firebaseErr = err as any | Error;
       console.error("[OTP Send] Error Details:", {
         code: "code" in firebaseErr ? firebaseErr.code : "unknown",
         message: firebaseErr.message,
@@ -423,7 +423,7 @@ function Login() {
         });
       }
     } catch (err) {
-      const firebaseErr = err as FirebaseAuthError;
+      const firebaseErr = err as any;
       console.error("[OTP Verify] Error:", {
         code: firebaseErr.code,
         message: firebaseErr.message,
